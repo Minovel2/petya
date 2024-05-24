@@ -12,6 +12,7 @@
 using namespace std;
 string path1, path2, path3;
 string searchInstitute1 = "", searchInstitute2 = "", searchKafedra3 = "";
+int defaultSize = 10;
 
 struct miit
 {
@@ -23,6 +24,11 @@ struct miit
     string kafedra;
     string kafedraNumber;
 };
+
+void afterError() {
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+}
 
 bool hasInstitute(vector<miit>& miits, string institute, miit& result) {
     for (miit& m : miits) {
@@ -149,6 +155,7 @@ void addSomeMiits(vector<miit>& miits) {
     cin >> miitCount;
     if (cin.fail() || miitCount < 0) {
         cout << "Ошибка";
+        afterError();
         return;
     }
 
@@ -196,6 +203,7 @@ void addSomeMiits(vector<miit>& miits) {
         cin >> kafedraCount;
         if (cin.fail() || kafedraCount < 0) {
             cout << "Ошибка";
+            afterError();
             return;
         }
         for (int j = 0; j < kafedraCount; j++) {
@@ -226,26 +234,15 @@ void addSomeMiits(vector<miit>& miits) {
 }
 
 void beforePrint() {
-    cout << " id | ";
-    cout << "Институт   | ";
-    cout << "Фамилия    | ";
-    cout << "Имя        | ";
-    cout << "Отчество   | ";
-    cout << "Тел. директора | ";
-    cout << "Кафедра    | ";
-    cout << "Тел. кафедры   | ";
+    cout << " " << setw(2) << "id" << " | ";
+    cout << setw(defaultSize) << "Институт" << " | ";
+    cout << setw(defaultSize) << "Фамилия" << " | ";
+    cout << setw(defaultSize) << "Имя" << " | ";
+    cout << setw(defaultSize) << "Отчество" << " | ";
+    cout << setw(14) << "Тел. директора" << " | ";
+    cout << setw(defaultSize) << "Кафедра" << " | ";
+    cout << setw(14) << "Тел. кафедры" << " | ";
     cout << "\n--------------------------------------------------------------------------------------------------------\n";
-}
-void beforePrintInFile(fstream& fs) {
-    fs << " id | ";
-    fs << "Институт   | ";
-    fs << "Фамилия    | ";
-    fs << "Имя        | ";
-    fs << "Отчество   | ";
-    fs << "Тел. директора | ";
-    fs << "Кафедра    | ";
-    fs << "Тел. кафедры   | ";
-    fs << "\n--------------------------------------------------------------------------------------------------------\n";
 }
 
 void print(vector<miit>& miits) {
@@ -254,39 +251,15 @@ void print(vector<miit>& miits) {
     for (miit& m : miits)
     {
         cout << " " << setw(2) << id << " | ";
-        cout << setw(10) << toRus(m.institute) << " | ";
-        cout << setw(10) << toRus(m.lastName) << " | ";
-        cout << setw(10) << toRus(m.firstName) << " | ";
-        cout << setw(10) << toRus(m.otchestvo) << " | ";
+        cout << setw(defaultSize) << toRus(m.institute) << " | ";
+        cout << setw(defaultSize) << toRus(m.lastName) << " | ";
+        cout << setw(defaultSize) << toRus(m.firstName) << " | ";
+        cout << setw(defaultSize) << toRus(m.otchestvo) << " | ";
         cout << setw(14) << toRus(m.directorNumber) << " | ";
-        cout << setw(10) << toRus(m.kafedra) << " | ";
+        cout << setw(defaultSize) << toRus(m.kafedra) << " | ";
         cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
         id++;
     }
-}
-
-void printOne(miit m, int id) {
-        cout << " " << setw(2) << id << " | ";
-        cout << setw(10) << toRus(m.institute) << " | ";
-        cout << setw(10) << toRus(m.lastName) << " | ";
-        cout << setw(10) << toRus(m.firstName) << " | ";
-        cout << setw(10) << toRus(m.otchestvo) << " | ";
-        cout << setw(14) << toRus(m.directorNumber) << " | ";
-        cout << setw(10) << toRus(m.kafedra) << " | ";
-        cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
-        id++;
-}
-
-void saveOne(miit m, int id, fstream& fs) {
-    fs << " " << setw(2) << id << " | ";
-    fs << setw(10) << toRus(m.institute) << " | ";
-    fs << setw(10) << toRus(m.lastName) << " | ";
-    fs << setw(10) << toRus(m.firstName) << " | ";
-    fs << setw(10) << toRus(m.otchestvo) << " | ";
-    fs << setw(14) << toRus(m.directorNumber) << " | ";
-    fs << setw(10) << toRus(m.kafedra) << " | ";
-    fs << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
-    id++;
 }
 
 void saveToFile(vector<miit>& miits) {
@@ -362,8 +335,8 @@ void removeProcess(vector<miit>& miits) {
     cin >> id;
     if (std::cin.fail() || id < 0) {
         std::cout << "Ошибка.";
-        std::cin.clear(); // очистить состояние ошибки
-        std::cin.ignore(10000, '\n'); // очистить буфер ввода
+        afterError(); // очистить состояние ошибки
+         // очистить буфер ввода
         return;
     }
 
@@ -381,29 +354,33 @@ void removeProcess(vector<miit>& miits) {
 void generateResult1(vector<miit> miits, bool mode) {
     fstream fs;
     fs.open(path1 + ".txt", fstream::out);
-    cout << "Введите институт: ";
-    getline(cin >> ws, searchInstitute1);
-    cout << "Список кафедр, входящих в институт " << searchInstitute1 << ":" << endl;
-    cout << " " << setw(2) << "id" << " | ";
-    cout << setw(10) << "Институт" << " | ";
-    cout << setw(10) << "Кафедра" << " | ";
-    cout << setw(14) << "Тел. кафедры" << " | ";
-    cout << "\n------------------------------------------------\n";
+    if (mode) {
+        cout << "Введите институт: ";
+        getline(cin >> ws, searchInstitute1);
+        cout << "Список кафедр, входящих в институт " << searchInstitute1 << ":" << endl;
+        cout << " " << setw(2) << "id" << " | ";
+        cout << setw(defaultSize) << "Институт" << " | ";
+        cout << setw(defaultSize) << "Кафедра" << " | ";
+        cout << setw(14) << "Тел. кафедры" << " | ";
+        cout << "\n------------------------------------------------\n";
+    }
     fs << " " << setw(2) << "id" << " | ";
-    fs << setw(10) << "Институт" << " | ";
-    fs << setw(10) << "Кафедра" << " | ";
+    fs << setw(defaultSize) << "Институт" << " | ";
+    fs << setw(defaultSize) << "Кафедра" << " | ";
     fs << setw(14) << "Тел. кафедры" << " | ";
     fs << "\n------------------------------------------------\n";
     int k = 1;
     for (miit& m : miits) {
         if (m.institute == searchInstitute1) {
-            cout << " " << setw(2) << k << " | ";
-            cout << setw(10) << m.institute << " | ";
-            cout << setw(10) << m.kafedra << " | ";
-            cout << setw(14) << m.kafedraNumber << " | " << endl;
+            if (mode) {
+                cout << " " << setw(2) << k << " | ";
+                cout << setw(defaultSize) << m.institute << " | ";
+                cout << setw(defaultSize) << m.kafedra << " | ";
+                cout << setw(14) << m.kafedraNumber << " | " << endl;
+            }
             fs << " " << setw(2) << k << " | ";
-            fs << setw(10) << m.institute << " | ";
-            fs << setw(10) << m.kafedra << " | ";
+            fs << setw(defaultSize) << m.institute << " | ";
+            fs << setw(defaultSize) << m.kafedra << " | ";
             fs << setw(14) << m.kafedraNumber << " | " << endl;
             k++;
         }
@@ -413,36 +390,40 @@ void generateResult1(vector<miit> miits, bool mode) {
 void generateResult2(vector<miit> miits, bool mode) {
     fstream fs;
     fs.open(path2 + ".txt", fstream::out);
-    cout << "Введите институт: ";
-    getline(cin >> ws, searchInstitute2);
-    cout << "ФИО и номер телефона директора института " << searchInstitute2 << ":" << endl;
-    cout << " " << setw(2) << "id" << " | ";
-    cout << setw(10) << "Институт" << " | ";
-    cout << setw(10) << "Фамилия" << " | ";
-    cout << setw(10) << "Имя" << " | ";
-    cout << setw(10) << "Отчество" << " | ";
-    cout << setw(14) << "Тел. директора" << " | ";
-    cout << "\n-------------------------------------------------------------------------\n";
-    fs << setw(10) << "Институт" << " | ";
-    fs << setw(10) << "Фамилия" << " | ";
-    fs << setw(10) << "Имя" << " | ";
-    fs << setw(10) << "Отчество" << " | ";
+    if (mode) {
+        cout << "Введите институт: ";
+        getline(cin >> ws, searchInstitute2);
+        cout << "ФИО и номер телефона директора института " << searchInstitute2 << ":" << endl;
+        cout << " " << setw(2) << "id" << " | ";
+        cout << setw(defaultSize) << "Институт" << " | ";
+        cout << setw(defaultSize) << "Фамилия" << " | ";
+        cout << setw(defaultSize) << "Имя" << " | ";
+        cout << setw(defaultSize) << "Отчество" << " | ";
+        cout << setw(14) << "Тел. директора" << " | ";
+        cout << "\n-------------------------------------------------------------------------\n";
+    }
+    fs << setw(defaultSize) << "Институт" << " | ";
+    fs << setw(defaultSize) << "Фамилия" << " | ";
+    fs << setw(defaultSize) << "Имя" << " | ";
+    fs << setw(defaultSize) << "Отчество" << " | ";
     fs << setw(14) << "Тел. директора" << " | ";
     fs << "\n-------------------------------------------------------------------------\n";
     int k = 1;
     for (miit& m : miits) {
         if (m.institute == searchInstitute2) {
-            cout << " " << setw(2) << k << " | ";
-            cout << setw(10) << m.institute << " | ";
-            cout << setw(10) << m.lastName << " | ";
-            cout << setw(10) << m.firstName << " | ";
-            cout << setw(10) << m.otchestvo << " | ";
-            cout << setw(14) << m.directorNumber << " | " << endl;
+            if (mode) {
+                cout << " " << setw(2) << k << " | ";
+                cout << setw(defaultSize) << m.institute << " | ";
+                cout << setw(defaultSize) << m.lastName << " | ";
+                cout << setw(defaultSize) << m.firstName << " | ";
+                cout << setw(defaultSize) << m.otchestvo << " | ";
+                cout << setw(14) << m.directorNumber << " | " << endl;
+            }
             fs << " " << setw(2) << k << " | ";
-            fs << setw(10) << m.institute << " | ";
-            fs << setw(10) << m.lastName << " | ";
-            fs << setw(10) << m.firstName << " | ";
-            fs << setw(10) << m.otchestvo << " | ";
+            fs << setw(defaultSize) << m.institute << " | ";
+            fs << setw(defaultSize) << m.lastName << " | ";
+            fs << setw(defaultSize) << m.firstName << " | ";
+            fs << setw(defaultSize) << m.otchestvo << " | ";
             fs << setw(14) << m.directorNumber << " | " << endl;
             break;
         }
@@ -451,30 +432,41 @@ void generateResult2(vector<miit> miits, bool mode) {
 
 void generateResult3(vector<miit> miits, bool mode) {
     fstream fs;
-    fs.open(path2 + ".txt", fstream::out);
-    cout << "Введите название кафедры, телефон которой вывести: ";
-    getline(cin >> ws, searchKafedra3);
-    cout << "Телефон кафедры " << searchKafedra3 << ":" << endl;
-    cout << " " << setw(2) << "id" << " | ";
-    cout << setw(10) << "Кафедра" << " | ";
-    cout << setw(14) << "Тел. кафедры" << " | ";
-    cout << "\n-----------------------------------\n";
+    fs.open(path3 + ".txt", fstream::out);
+    if (mode) {
+        cout << "Введите название кафедры, телефон которой вывести: ";
+        getline(cin >> ws, searchKafedra3);
+        cout << "Телефон кафедры " << searchKafedra3 << ":" << endl;
+        cout << " " << setw(2) << "id" << " | ";
+        cout << setw(defaultSize) << "Кафедра" << " | ";
+        cout << setw(14) << "Тел. кафедры" << " | ";
+        cout << "\n-----------------------------------\n";
+    }
     fs << " " << setw(2) << "id" << " | ";
-    fs << setw(10) << "Кафедра" << " | ";
+    fs << setw(defaultSize) << "Кафедра" << " | ";
     fs << setw(14) << "Тел. кафедры" << " | ";
     fs << "\n-----------------------------------\n";
     int k = 1;
     for (miit& m : miits) {
         if (m.kafedra == searchKafedra3) {
-            cout << " " << setw(2) << k << " | ";
-            cout << setw(10) << toRus(m.kafedra) << " | ";
-            cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+            if (mode) {
+                cout << " " << setw(2) << k << " | ";
+                cout << setw(defaultSize) << m.kafedra << " | ";
+                cout << setw(14) << m.kafedraNumber << " | " << endl;
+            }
             fs << " " << setw(2) << k << " | ";
-            fs << setw(10) << toRus(m.kafedra) << " | ";
-            fs << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+            fs << setw(defaultSize) << m.kafedra << " | ";
+            fs << setw(14) << m.kafedraNumber << " | " << endl;
             break;
         }
     }
+}
+
+void updateResults(vector<miit>& miits) {
+    cout << setiosflags(ios::left);
+    generateResult1(miits, 0);
+    generateResult2(miits, 0);
+    generateResult3(miits, 0);
 }
 
 const int buttonsCount1 = 7;
@@ -538,13 +530,13 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
             if (menuType == 1) {
                 switch (menu) {
                 case 0:
-                    generateResult1(miits);
+                    generateResult1(miits, 1);
                     break;
                 case 1:
-                    generateResult2(miits);
+                    generateResult2(miits, 1);
                     break;
                 case 2:
-                    generateResult3(miits);
+                    generateResult3(miits, 1);
                     break;
                 case 3:
                     menuType = 2;
@@ -552,9 +544,11 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
                     break;
                 case 4:
                     addSomeMiits(miits);
+                    updateResults(miits);
                     break;
                 case 5:
                     removeProcess(miits);
+                    updateResults(miits);
                     break;
                 case 6:
                     saveToFile(miits);
@@ -569,6 +563,7 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
                 else {
                     system("cls");
                     megaSort(menu, miits);
+                    updateResults(miits);
                 }
             }
         }
@@ -596,6 +591,7 @@ int main()
     cin >> mode;
     if (cin.fail()) {
         cout << "Ошибка";
+        afterError();
         return 0;
     }
 
@@ -631,7 +627,8 @@ int main()
         p += ".json";
         fs.open(p, fstream::in);
         if (!fs.is_open()) {
-            cout << "Ошибка открытия файла, возможно, файла с таким именем не существует.";
+            cout << "\nОшибка открытия файла, возможно, файла с таким именем не существует.";
+            afterError();
             return 0;
         }
         else {
