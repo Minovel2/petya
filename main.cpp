@@ -506,10 +506,10 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
     bool cycle = true;
     while (cycle) {
         ch = _getch();
-        if (ch == 115 || ch == 80 || ch == 50) {
+        if (ch == 115 || ch == 80 || ch == 50 || ch == 251) {
             menu = (menu + 1) % buttonsCount;
         }
-        else if (ch == 119 || ch == 72 || ch == 56) {
+        else if (ch == 119 || ch == 72 || ch == 56 || ch == 246) {
             if (menu == 0)
                 menu = buttonsCount;
 
