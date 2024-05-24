@@ -8,9 +8,10 @@
 #include <algorithm>
 #include <conio.h>
 #include "dependencies/include/nlohmann/json.hpp"
-#include <map>
+#include <regex>
 using namespace std;
 string path1, path2, path3;
+string searchInstitute1 = "", searchInstitute2 = "", searchKafedra3 = "";
 
 struct miit
 {
@@ -22,6 +23,21 @@ struct miit
     string kafedra;
     string kafedraNumber;
 };
+
+bool hasInstitute(vector<miit>& miits, string institute, miit& result) {
+    for (miit& m : miits) {
+        if (m.institute == institute) {
+            result = m;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isPhoneNumber(const std::string& number) {
+    std::regex pattern("(\\+7|8)\\s?\\(?\\d{3}\\)?\\s?\\d{3}\\-?\\d{2}\\-?\\d{2}");
+    return std::regex_match(number, pattern);
+}
 
 string toEng(string& str) {
     string s;
@@ -140,20 +156,42 @@ void addSomeMiits(vector<miit>& miits) {
         miit Miit;
         cout << "Введите наименование института " << i + 1 << ": ";
         getline(cin >> ws, data);
-        Miit.institute = toEng(data);
-        cout << "Введите фамилию директора института " << i + 1 << ": ";
-        getline(cin >> ws, data);
-        Miit.lastName = toEng(data);
-        cout << "Введите имя директора института " << i + 1 << ": ";
-        getline(cin >> ws, data);
-        Miit.firstName = toEng(data);
-        cout << "Введите отчество директора института " << i + 1 << ": ";
-        getline(cin >> ws, data);
-        Miit.otchestvo = toEng(data);
-        cout << "Введите номер телефона директора института " << i + 1 << ": ";
-        getline(cin >> ws, data);
-        Miit.directorNumber = data;
+        Miit.institute = data;
+        miit result;
+        if (hasInstitute(miits, Miit.institute, result)) {
+            cout << "Фамилия директора института " << i + 1 << ": " << result.lastName << endl;
+            Miit.lastName = result.lastName;
+            cout << "Имя директора института " << i + 1 << ": " << result.firstName << endl;
+            Miit.firstName = result.firstName;
+            cout << "Отчество директора института " << i + 1 << ": " << result.otchestvo << endl;
+            Miit.otchestvo = result.otchestvo;
+            cout << "Номер тел. директора института " << i + 1 << ": " << result.directorNumber << endl;
+            Miit.directorNumber = result.directorNumber;
+        }
+        else {
+            cout << "Введите фамилию директора института " << i + 1 << ": ";
+            getline(cin >> ws, data);
+            Miit.lastName = data;
+            cout << "Введите имя директора института " << i + 1 << ": ";
+            getline(cin >> ws, data);
+            Miit.firstName = data;
+            cout << "Введите отчество директора института " << i + 1 << ": ";
+            getline(cin >> ws, data);
+            Miit.otchestvo = data;
 
+            while (true) {
+                cout << "Введите номер телефона директора института " << i + 1 << ": ";
+                getline(cin >> ws, data);
+                if (isPhoneNumber(data)) {
+                    Miit.directorNumber = data;
+                    break;
+                }
+                else {
+                    cout << "Это не номер телефона, введите номер корректно." << endl;
+                }
+            }
+        }
+        
         cout << "Сколько кафедр МИИТа вы хотите добавить?: ";
         cin >> kafedraCount;
         if (cin.fail() || kafedraCount < 0) {
@@ -163,12 +201,25 @@ void addSomeMiits(vector<miit>& miits) {
         for (int j = 0; j < kafedraCount; j++) {
             cout << "Введите название кафедры " << j + 1 << ": ";
             getline(cin >> ws, data);
-            Miit.kafedra = toEng(data);
-            cout << "Введите номер телефона кафедры " << j + 1 << ": ";
-            getline(cin >> ws, data);
-            Miit.kafedraNumber = data;
-            if (canPushMiit(miits, Miit.institute, Miit.lastName, Miit.firstName, Miit.otchestvo, Miit.directorNumber, Miit.kafedra, Miit.kafedraNumber))
+            Miit.kafedra = data;
+            while (true) {
+                cout << "Введите номер телефона кафедры " << j + 1 << ": ";
+                getline(cin >> ws, data);
+                if (isPhoneNumber(data)) {
+                    Miit.kafedraNumber = data;
+                    break;
+                }
+                else {
+                    cout << "Это не номер телефона, введите номер корректно." << endl;
+                }
+            }
+            
+            if (canPushMiit(miits, Miit.institute, Miit.lastName, Miit.firstName, Miit.otchestvo, Miit.directorNumber, Miit.kafedra, Miit.kafedraNumber)) {
                 miits.push_back(Miit);
+                cout << "Данные добавлены!" << endl;
+            } else {
+                cout << "Данные не добавлены. Проверьте внимательно данные (к примеру, директор не может иметь несколько разных номеров тел., кафедры не могут иметь несколько номеров тел., директор не может управлять несколькими кафедрами, институт не может иметь кафедры из других институтов)" << endl;
+            }
         }
         cout << endl;
     }
@@ -187,9 +238,14 @@ void beforePrint() {
 }
 void beforePrintInFile(fstream& fs) {
     fs << " id | ";
-    fs << "Имя кинотеатра       | ";
-    fs << "Фильм                | ";
-    fs << "\n---------------------------------------------------\n";
+    fs << "Институт   | ";
+    fs << "Фамилия    | ";
+    fs << "Имя        | ";
+    fs << "Отчество   | ";
+    fs << "Тел. директора | ";
+    fs << "Кафедра    | ";
+    fs << "Тел. кафедры   | ";
+    fs << "\n--------------------------------------------------------------------------------------------------------\n";
 }
 
 void print(vector<miit>& miits) {
@@ -209,6 +265,30 @@ void print(vector<miit>& miits) {
     }
 }
 
+void printOne(miit m, int id) {
+        cout << " " << setw(2) << id << " | ";
+        cout << setw(10) << toRus(m.institute) << " | ";
+        cout << setw(10) << toRus(m.lastName) << " | ";
+        cout << setw(10) << toRus(m.firstName) << " | ";
+        cout << setw(10) << toRus(m.otchestvo) << " | ";
+        cout << setw(14) << toRus(m.directorNumber) << " | ";
+        cout << setw(10) << toRus(m.kafedra) << " | ";
+        cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+        id++;
+}
+
+void saveOne(miit m, int id, fstream& fs) {
+    fs << " " << setw(2) << id << " | ";
+    fs << setw(10) << toRus(m.institute) << " | ";
+    fs << setw(10) << toRus(m.lastName) << " | ";
+    fs << setw(10) << toRus(m.firstName) << " | ";
+    fs << setw(10) << toRus(m.otchestvo) << " | ";
+    fs << setw(14) << toRus(m.directorNumber) << " | ";
+    fs << setw(10) << toRus(m.kafedra) << " | ";
+    fs << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+    id++;
+}
+
 void saveToFile(vector<miit>& miits) {
     toEng(miits);
     nlohmann::json j = miits;
@@ -220,13 +300,187 @@ void saveToFile(vector<miit>& miits) {
     fs.open(p, fstream::out);
     fs << j;
     fs.close();
+    cout << "Сохранено в " << p;
     toRus(miits);
 }
 
+void megaSort(int& sortField, vector<miit>& miits) {
+    bool mode;
+    cout << "Введите 1 (сортировать по возрастанию) или 0 (по убыванию): ";
+    cin >> mode;
+    if (cin.fail())
+        return;
+
+    switch (sortField) {
+    case 0:
+        if (mode) {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.institute < c2.institute; });
+        }
+        else {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.institute > c2.institute; });
+        }
+        break;
+    case 1:
+        if (mode) {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.lastName + c1.firstName + c1.otchestvo < c2.lastName + c2.firstName + c2.otchestvo; });
+        }
+        else {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.lastName + c1.firstName + c1.otchestvo > c2.lastName + c2.firstName + c2.otchestvo; });
+        }
+        break;
+    case 2:
+        if (mode) {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.directorNumber < c2.directorNumber; });
+        }
+        else {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.directorNumber > c2.directorNumber; });
+        }
+        break;
+    case 3:
+        if (mode) {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.kafedra < c2.kafedra; });
+        }
+        else {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.kafedra > c2.kafedra; });
+        }
+        break;
+    case 4:
+        if (mode) {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.kafedraNumber < c2.kafedraNumber; });
+        }
+        else {
+            sort(miits.begin(), miits.end(), [](miit& c1, miit& c2) { return c1.kafedraNumber > c2.kafedraNumber; });
+        }
+        break;
+    }
+}
+
+void removeProcess(vector<miit>& miits) {
+    print(miits);
+    int k = 0, id = 0;
+    cout << "Введите номер строки, которую хотите удалить: ";
+    cin >> id;
+    if (std::cin.fail() || id < 0) {
+        std::cout << "Ошибка.";
+        std::cin.clear(); // очистить состояние ошибки
+        std::cin.ignore(10000, '\n'); // очистить буфер ввода
+        return;
+    }
+
+    for (vector<miit>::iterator i = miits.begin(); i < miits.end(); i++) {
+        k++;
+        if (k == id) {
+            miits.erase(i);
+            cout << "Удалено!";
+            return;
+        }
+    }
+    cout << "Не удалено, возможно такой строки не существует";
+}
+
+void generateResult1(vector<miit> miits, bool mode) {
+    fstream fs;
+    fs.open(path1 + ".txt", fstream::out);
+    cout << "Введите институт: ";
+    getline(cin >> ws, searchInstitute1);
+    cout << "Список кафедр, входящих в институт " << searchInstitute1 << ":" << endl;
+    cout << " " << setw(2) << "id" << " | ";
+    cout << setw(10) << "Институт" << " | ";
+    cout << setw(10) << "Кафедра" << " | ";
+    cout << setw(14) << "Тел. кафедры" << " | ";
+    cout << "\n------------------------------------------------\n";
+    fs << " " << setw(2) << "id" << " | ";
+    fs << setw(10) << "Институт" << " | ";
+    fs << setw(10) << "Кафедра" << " | ";
+    fs << setw(14) << "Тел. кафедры" << " | ";
+    fs << "\n------------------------------------------------\n";
+    int k = 1;
+    for (miit& m : miits) {
+        if (m.institute == searchInstitute1) {
+            cout << " " << setw(2) << k << " | ";
+            cout << setw(10) << m.institute << " | ";
+            cout << setw(10) << m.kafedra << " | ";
+            cout << setw(14) << m.kafedraNumber << " | " << endl;
+            fs << " " << setw(2) << k << " | ";
+            fs << setw(10) << m.institute << " | ";
+            fs << setw(10) << m.kafedra << " | ";
+            fs << setw(14) << m.kafedraNumber << " | " << endl;
+            k++;
+        }
+    }
+}
+
+void generateResult2(vector<miit> miits, bool mode) {
+    fstream fs;
+    fs.open(path2 + ".txt", fstream::out);
+    cout << "Введите институт: ";
+    getline(cin >> ws, searchInstitute2);
+    cout << "ФИО и номер телефона директора института " << searchInstitute2 << ":" << endl;
+    cout << " " << setw(2) << "id" << " | ";
+    cout << setw(10) << "Институт" << " | ";
+    cout << setw(10) << "Фамилия" << " | ";
+    cout << setw(10) << "Имя" << " | ";
+    cout << setw(10) << "Отчество" << " | ";
+    cout << setw(14) << "Тел. директора" << " | ";
+    cout << "\n-------------------------------------------------------------------------\n";
+    fs << setw(10) << "Институт" << " | ";
+    fs << setw(10) << "Фамилия" << " | ";
+    fs << setw(10) << "Имя" << " | ";
+    fs << setw(10) << "Отчество" << " | ";
+    fs << setw(14) << "Тел. директора" << " | ";
+    fs << "\n-------------------------------------------------------------------------\n";
+    int k = 1;
+    for (miit& m : miits) {
+        if (m.institute == searchInstitute2) {
+            cout << " " << setw(2) << k << " | ";
+            cout << setw(10) << m.institute << " | ";
+            cout << setw(10) << m.lastName << " | ";
+            cout << setw(10) << m.firstName << " | ";
+            cout << setw(10) << m.otchestvo << " | ";
+            cout << setw(14) << m.directorNumber << " | " << endl;
+            fs << " " << setw(2) << k << " | ";
+            fs << setw(10) << m.institute << " | ";
+            fs << setw(10) << m.lastName << " | ";
+            fs << setw(10) << m.firstName << " | ";
+            fs << setw(10) << m.otchestvo << " | ";
+            fs << setw(14) << m.directorNumber << " | " << endl;
+            break;
+        }
+    }
+}
+
+void generateResult3(vector<miit> miits, bool mode) {
+    fstream fs;
+    fs.open(path2 + ".txt", fstream::out);
+    cout << "Введите название кафедры, телефон которой вывести: ";
+    getline(cin >> ws, searchKafedra3);
+    cout << "Телефон кафедры " << searchKafedra3 << ":" << endl;
+    cout << " " << setw(2) << "id" << " | ";
+    cout << setw(10) << "Кафедра" << " | ";
+    cout << setw(14) << "Тел. кафедры" << " | ";
+    cout << "\n-----------------------------------\n";
+    fs << " " << setw(2) << "id" << " | ";
+    fs << setw(10) << "Кафедра" << " | ";
+    fs << setw(14) << "Тел. кафедры" << " | ";
+    fs << "\n-----------------------------------\n";
+    int k = 1;
+    for (miit& m : miits) {
+        if (m.kafedra == searchKafedra3) {
+            cout << " " << setw(2) << k << " | ";
+            cout << setw(10) << toRus(m.kafedra) << " | ";
+            cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+            fs << " " << setw(2) << k << " | ";
+            fs << setw(10) << toRus(m.kafedra) << " | ";
+            fs << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+            break;
+        }
+    }
+}
+
 const int buttonsCount1 = 7;
-string* text1 = new string[buttonsCount1]{"создать список кафедр, входящих в институт, название которого вводится с клавиатуры","a2","a3","Сортировка","a2","a3","Сохранить как исходные данные"};
-const int buttonsCount2 = 3;
-string* text2 = new string[buttonsCount2]{ "а4","a5","a6" };
+string* text1 = new string[buttonsCount1]{"Создать список кафедр, входящих в институт, название которого вводится с клавиатуры","Создать список с ФИО и номером телефона директора института, название которого вводится с клавиатуры","Записать телефон кафедры, название которой вводится с клавиатуры","Сортировка","Добавить данные","Удалить данные","Сохранить как исходные данные"};
+const int buttonsCount2 = 6;
+string* text2 = new string[buttonsCount2]{ "По институту","По ФИО директора","По тел. директора","По кафедре","По тел. кафедры","Назад"};
 int buttonsCount;
 
 void showMenu(int& menu, vector<miit>& miits, string* text) {
@@ -284,18 +538,23 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
             if (menuType == 1) {
                 switch (menu) {
                 case 0:
+                    generateResult1(miits);
                     break;
                 case 1:
+                    generateResult2(miits);
                     break;
                 case 2:
+                    generateResult3(miits);
                     break;
                 case 3:
                     menuType = 2;
                     menu = 0;
                     break;
                 case 4:
+                    addSomeMiits(miits);
                     break;
                 case 5:
+                    removeProcess(miits);
                     break;
                 case 6:
                     saveToFile(miits);
@@ -303,8 +562,14 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
                 }
             }
             else if (menuType == 2) {
-                menuType = 1;
-                menu = 3;
+                if (menu == 5) {
+                    menuType = 1;
+                    menu = 3;
+                }
+                else {
+                    system("cls");
+                    megaSort(menu, miits);
+                }
             }
         }
     }
@@ -354,7 +619,9 @@ int main()
 
     if (mode) {
         addSomeMiits(miits);
+        toEng(miits);
         nlohmann::json j = miits;
+        toRus(miits);
         print(miits);
     }
     else {
@@ -382,7 +649,7 @@ int main()
     int menuType = 1;
     while (true) {
         startCycle(miits, menu, menuType);
-        if (menuType == 1)
+        if (menuType == 1 && menu != 3)
             _getch();
     }
 
