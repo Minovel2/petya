@@ -364,7 +364,7 @@ void generateResult1(vector<miit> miits, bool mode) {
         cout << setw(14) << "Тел. кафедры" << " | ";
         cout << "\n------------------------------------------------\n";
     }
-    fs << " " << setw(2) << "id" << " | ";
+    fs << left << " " << setw(2) << "id" << " | ";
     fs << setw(defaultSize) << "Институт" << " | ";
     fs << setw(defaultSize) << "Кафедра" << " | ";
     fs << setw(14) << "Тел. кафедры" << " | ";
@@ -402,12 +402,13 @@ void generateResult2(vector<miit> miits, bool mode) {
         cout << setw(14) << "Тел. директора" << " | ";
         cout << "\n-------------------------------------------------------------------------\n";
     }
+    fs << left << " " << setw(2) << "id" << " | ";
     fs << setw(defaultSize) << "Институт" << " | ";
     fs << setw(defaultSize) << "Фамилия" << " | ";
     fs << setw(defaultSize) << "Имя" << " | ";
     fs << setw(defaultSize) << "Отчество" << " | ";
     fs << setw(14) << "Тел. директора" << " | ";
-    fs << "\n-------------------------------------------------------------------------\n";
+    fs << "\n--------------------------------------------------------------------------\n";
     int k = 1;
     for (miit& m : miits) {
         if (m.institute == searchInstitute2) {
@@ -442,7 +443,7 @@ void generateResult3(vector<miit> miits, bool mode) {
         cout << setw(14) << "Тел. кафедры" << " | ";
         cout << "\n-----------------------------------\n";
     }
-    fs << " " << setw(2) << "id" << " | ";
+    fs << left << " " << setw(2) << "id" << " | ";
     fs << setw(defaultSize) << "Кафедра" << " | ";
     fs << setw(14) << "Тел. кафедры" << " | ";
     fs << "\n-----------------------------------\n";
@@ -463,7 +464,6 @@ void generateResult3(vector<miit> miits, bool mode) {
 }
 
 void updateResults(vector<miit>& miits) {
-    cout << setiosflags(ios::left);
     generateResult1(miits, 0);
     generateResult2(miits, 0);
     generateResult3(miits, 0);
