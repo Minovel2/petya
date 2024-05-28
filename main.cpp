@@ -12,7 +12,8 @@
 using namespace std;
 string path1, path2, path3;
 string searchInstitute1 = "", searchInstitute2 = "", searchKafedra3 = "";
-int defaultSize = 10;
+int instituteSize, firstNameSize, lastNameSize, otchestvoSize, kafedraSize, idSize;
+int numberSize = 17;
 
 struct miit
 {
@@ -24,6 +25,44 @@ struct miit
     string kafedra;
     string kafedraNumber;
 };
+
+string getBigLine(int n) {
+    string s = "\n";
+    for (int i = 0; i < n; i++) {
+        s += '-';
+    }
+    s += '\n';
+    return s;
+}
+
+void updateSizes(vector<miit>& miits) {
+    instituteSize = 10, firstNameSize = 10, lastNameSize = 10, otchestvoSize = 10, kafedraSize = 10, idSize = 2;
+    int k = 1, idSizeCounter = 0;
+    for (miit& m : miits) {
+        if (k % 10 == 0) {
+            idSizeCounter++;
+        }
+        if (m.institute.length() > instituteSize) {
+            instituteSize = m.institute.length();
+        }
+        if (m.firstName.length() > firstNameSize) {
+            firstNameSize = m.firstName.length();
+        }
+        if (m.lastName.length() > lastNameSize) {
+            lastNameSize = m.lastName.length();
+        }
+        if (m.otchestvo.length() > otchestvoSize) {
+            otchestvoSize = m.otchestvo.length();
+        }
+        if (m.kafedra.length() > kafedraSize) {
+            kafedraSize = m.kafedra.length();
+        }
+        k++;
+    }
+
+    if (idSizeCounter > idSize)
+        idSize = idSizeCounter;
+}
 
 void afterError() {
     std::cin.clear();
@@ -234,15 +273,15 @@ void addSomeMiits(vector<miit>& miits) {
 }
 
 void beforePrint() {
-    cout << " " << setw(2) << "id" << " | ";
-    cout << setw(defaultSize) << "Институт" << " | ";
-    cout << setw(defaultSize) << "Фамилия" << " | ";
-    cout << setw(defaultSize) << "Имя" << " | ";
-    cout << setw(defaultSize) << "Отчество" << " | ";
-    cout << setw(14) << "Тел. директора" << " | ";
-    cout << setw(defaultSize) << "Кафедра" << " | ";
-    cout << setw(14) << "Тел. кафедры" << " | ";
-    cout << "\n--------------------------------------------------------------------------------------------------------\n";
+    cout << " " << setw(idSize) << "id" << " | ";
+    cout << setw(instituteSize) << "Институт" << " | ";
+    cout << setw(lastNameSize) << "Фамилия" << " | ";
+    cout << setw(firstNameSize) << "Имя" << " | ";
+    cout << setw(otchestvoSize) << "Отчество" << " | ";
+    cout << setw(numberSize) << "Тел. директора" << " | ";
+    cout << setw(kafedraSize) << "Кафедра" << " | ";
+    cout << setw(numberSize) << "Тел. кафедры" << " | ";
+    cout << getBigLine(idSize + instituteSize + lastNameSize + firstNameSize + otchestvoSize + numberSize * 2 + kafedraSize + 8 * 3);
 }
 
 void print(vector<miit>& miits) {
@@ -250,14 +289,14 @@ void print(vector<miit>& miits) {
     int id = 1;
     for (miit& m : miits)
     {
-        cout << " " << setw(2) << id << " | ";
-        cout << setw(defaultSize) << toRus(m.institute) << " | ";
-        cout << setw(defaultSize) << toRus(m.lastName) << " | ";
-        cout << setw(defaultSize) << toRus(m.firstName) << " | ";
-        cout << setw(defaultSize) << toRus(m.otchestvo) << " | ";
-        cout << setw(14) << toRus(m.directorNumber) << " | ";
-        cout << setw(defaultSize) << toRus(m.kafedra) << " | ";
-        cout << setw(14) << toRus(m.kafedraNumber) << " | " << endl;
+        cout << " " << setw(idSize) << id << " | ";
+        cout << setw(instituteSize) << toRus(m.institute) << " | ";
+        cout << setw(lastNameSize) << toRus(m.lastName) << " | ";
+        cout << setw(firstNameSize) << toRus(m.firstName) << " | ";
+        cout << setw(otchestvoSize) << toRus(m.otchestvo) << " | ";
+        cout << setw(numberSize) << toRus(m.directorNumber) << " | ";
+        cout << setw(kafedraSize) << toRus(m.kafedra) << " | ";
+        cout << setw(numberSize) << toRus(m.kafedraNumber) << " | " << endl;
         id++;
     }
 }
@@ -358,30 +397,30 @@ void generateResult1(vector<miit> miits, bool mode) {
         cout << "Введите институт: ";
         getline(cin >> ws, searchInstitute1);
         cout << "Список кафедр, входящих в институт " << searchInstitute1 << ":" << endl;
-        cout << " " << setw(2) << "id" << " | ";
-        cout << setw(defaultSize) << "Институт" << " | ";
-        cout << setw(defaultSize) << "Кафедра" << " | ";
-        cout << setw(14) << "Тел. кафедры" << " | ";
-        cout << "\n------------------------------------------------\n";
+        cout << " " << setw(idSize) << "id" << " | ";
+        cout << setw(instituteSize) << "Институт" << " | ";
+        cout << setw(kafedraSize) << "Кафедра" << " | ";
+        cout << setw(numberSize) << "Тел. кафедры" << " | ";
+        cout << getBigLine(idSize + instituteSize + numberSize + kafedraSize + 4 * 3);
     }
-    fs << left << " " << setw(2) << "id" << " | ";
-    fs << setw(defaultSize) << "Институт" << " | ";
-    fs << setw(defaultSize) << "Кафедра" << " | ";
-    fs << setw(14) << "Тел. кафедры" << " | ";
-    fs << "\n------------------------------------------------\n";
+    fs << left << " " << setw(idSize) << "id" << " | ";
+    fs << setw(instituteSize) << "Институт" << " | ";
+    fs << setw(kafedraSize) << "Кафедра" << " | ";
+    fs << setw(numberSize) << "Тел. кафедры" << " | ";
+    fs << getBigLine(idSize + instituteSize + numberSize + kafedraSize + 4 * 3);
     int k = 1;
     for (miit& m : miits) {
         if (m.institute == searchInstitute1) {
             if (mode) {
-                cout << " " << setw(2) << k << " | ";
-                cout << setw(defaultSize) << m.institute << " | ";
-                cout << setw(defaultSize) << m.kafedra << " | ";
-                cout << setw(14) << m.kafedraNumber << " | " << endl;
+                cout << " " << setw(idSize) << k << " | ";
+                cout << setw(instituteSize) << m.institute << " | ";
+                cout << setw(kafedraSize) << m.kafedra << " | ";
+                cout << setw(numberSize) << m.kafedraNumber << " | " << endl;
             }
-            fs << " " << setw(2) << k << " | ";
-            fs << setw(defaultSize) << m.institute << " | ";
-            fs << setw(defaultSize) << m.kafedra << " | ";
-            fs << setw(14) << m.kafedraNumber << " | " << endl;
+            fs << " " << setw(idSize) << k << " | ";
+            fs << setw(instituteSize) << m.institute << " | ";
+            fs << setw(kafedraSize) << m.kafedra << " | ";
+            fs << setw(numberSize) << m.kafedraNumber << " | " << endl;
             k++;
         }
     }
@@ -394,38 +433,38 @@ void generateResult2(vector<miit> miits, bool mode) {
         cout << "Введите институт: ";
         getline(cin >> ws, searchInstitute2);
         cout << "ФИО и номер телефона директора института " << searchInstitute2 << ":" << endl;
-        cout << " " << setw(2) << "id" << " | ";
-        cout << setw(defaultSize) << "Институт" << " | ";
-        cout << setw(defaultSize) << "Фамилия" << " | ";
-        cout << setw(defaultSize) << "Имя" << " | ";
-        cout << setw(defaultSize) << "Отчество" << " | ";
-        cout << setw(14) << "Тел. директора" << " | ";
-        cout << "\n-------------------------------------------------------------------------\n";
+        cout << " " << setw(idSize) << "id" << " | ";
+        cout << setw(instituteSize) << "Институт" << " | ";
+        cout << setw(lastNameSize) << "Фамилия" << " | ";
+        cout << setw(firstNameSize) << "Имя" << " | ";
+        cout << setw(otchestvoSize) << "Отчество" << " | ";
+        cout << setw(numberSize) << "Тел. директора" << " | ";
+        cout << getBigLine(idSize + instituteSize + lastNameSize + firstNameSize + otchestvoSize + numberSize + 6 * 3);
     }
-    fs << left << " " << setw(2) << "id" << " | ";
-    fs << setw(defaultSize) << "Институт" << " | ";
-    fs << setw(defaultSize) << "Фамилия" << " | ";
-    fs << setw(defaultSize) << "Имя" << " | ";
-    fs << setw(defaultSize) << "Отчество" << " | ";
-    fs << setw(14) << "Тел. директора" << " | ";
-    fs << "\n--------------------------------------------------------------------------\n";
+    fs << left << " " << setw(idSize) << "id" << " | ";
+    fs << setw(instituteSize) << "Институт" << " | ";
+    fs << setw(lastNameSize) << "Фамилия" << " | ";
+    fs << setw(firstNameSize) << "Имя" << " | ";
+    fs << setw(otchestvoSize) << "Отчество" << " | ";
+    fs << setw(numberSize) << "Тел. директора" << " | ";
+    fs << getBigLine(idSize + instituteSize + lastNameSize + firstNameSize + otchestvoSize + numberSize + 6 * 3);
     int k = 1;
     for (miit& m : miits) {
         if (m.institute == searchInstitute2) {
             if (mode) {
-                cout << " " << setw(2) << k << " | ";
-                cout << setw(defaultSize) << m.institute << " | ";
-                cout << setw(defaultSize) << m.lastName << " | ";
-                cout << setw(defaultSize) << m.firstName << " | ";
-                cout << setw(defaultSize) << m.otchestvo << " | ";
-                cout << setw(14) << m.directorNumber << " | " << endl;
+                cout << " " << setw(idSize) << k << " | ";
+                cout << setw(instituteSize) << m.institute << " | ";
+                cout << setw(lastNameSize) << m.lastName << " | ";
+                cout << setw(firstNameSize) << m.firstName << " | ";
+                cout << setw(otchestvoSize) << m.otchestvo << " | ";
+                cout << setw(numberSize) << m.directorNumber << " | " << endl;
             }
-            fs << " " << setw(2) << k << " | ";
-            fs << setw(defaultSize) << m.institute << " | ";
-            fs << setw(defaultSize) << m.lastName << " | ";
-            fs << setw(defaultSize) << m.firstName << " | ";
-            fs << setw(defaultSize) << m.otchestvo << " | ";
-            fs << setw(14) << m.directorNumber << " | " << endl;
+            fs << " " << setw(idSize) << k << " | ";
+            fs << setw(instituteSize) << m.institute << " | ";
+            fs << setw(lastNameSize) << m.lastName << " | ";
+            fs << setw(firstNameSize) << m.firstName << " | ";
+            fs << setw(otchestvoSize) << m.otchestvo << " | ";
+            fs << setw(numberSize) << m.directorNumber << " | " << endl;
             break;
         }
     }
@@ -438,26 +477,26 @@ void generateResult3(vector<miit> miits, bool mode) {
         cout << "Введите название кафедры, телефон которой вывести: ";
         getline(cin >> ws, searchKafedra3);
         cout << "Телефон кафедры " << searchKafedra3 << ":" << endl;
-        cout << " " << setw(2) << "id" << " | ";
-        cout << setw(defaultSize) << "Кафедра" << " | ";
-        cout << setw(14) << "Тел. кафедры" << " | ";
-        cout << "\n-----------------------------------\n";
+        cout << " " << setw(idSize) << "id" << " | ";
+        cout << setw(kafedraSize) << "Кафедра" << " | ";
+        cout << setw(numberSize) << "Тел. кафедры" << " | ";
+        cout << getBigLine(idSize + kafedraSize + numberSize + 3 * 3);
     }
-    fs << left << " " << setw(2) << "id" << " | ";
-    fs << setw(defaultSize) << "Кафедра" << " | ";
-    fs << setw(14) << "Тел. кафедры" << " | ";
-    fs << "\n-----------------------------------\n";
+    fs << left << " " << setw(idSize) << "id" << " | ";
+    fs << setw(kafedraSize) << "Кафедра" << " | ";
+    fs << setw(numberSize) << "Тел. кафедры" << " | ";
+    fs << getBigLine(idSize + kafedraSize + numberSize + 3 * 3);
     int k = 1;
     for (miit& m : miits) {
         if (m.kafedra == searchKafedra3) {
             if (mode) {
-                cout << " " << setw(2) << k << " | ";
-                cout << setw(defaultSize) << m.kafedra << " | ";
-                cout << setw(14) << m.kafedraNumber << " | " << endl;
+                cout << " " << setw(idSize) << k << " | ";
+                cout << setw(kafedraSize) << m.kafedra << " | ";
+                cout << setw(numberSize) << m.kafedraNumber << " | " << endl;
             }
-            fs << " " << setw(2) << k << " | ";
-            fs << setw(defaultSize) << m.kafedra << " | ";
-            fs << setw(14) << m.kafedraNumber << " | " << endl;
+            fs << " " << setw(idSize) << k << " | ";
+            fs << setw(kafedraSize) << m.kafedra << " | ";
+            fs << setw(numberSize) << m.kafedraNumber << " | " << endl;
             break;
         }
     }
@@ -544,10 +583,12 @@ void startCycle(vector<miit>& miits, int& menu, int& menuType) {
                     break;
                 case 4:
                     addSomeMiits(miits);
+                    updateSizes(miits);
                     updateResults(miits);
                     break;
                 case 5:
                     removeProcess(miits);
+                    updateSizes(miits);
                     updateResults(miits);
                     break;
                 case 6:
@@ -618,6 +659,7 @@ int main()
         toEng(miits);
         nlohmann::json j = miits;
         toRus(miits);
+        updateSizes(miits);
         print(miits);
     }
     else {
@@ -635,6 +677,7 @@ int main()
             nlohmann::json j;
             fs >> j;
             miits = j;
+            updateSizes(miits);
             print(miits);
         }
 
